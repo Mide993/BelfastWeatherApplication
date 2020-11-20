@@ -35,22 +35,32 @@ namespace WeatherApplication.Controllers
         [HttpGet]
         public async Task<Root> GetWeatherData()
         {
-            HttpClient client = new HttpClient();
-            Root weatherData = new Root();
-            client.BaseAddress = new Uri("https://www.metaweather.com/api/");
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage response = await client.GetAsync("https://www.metaweather.com/api/location/44544/");
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string responseBody = await response.Content.ReadAsStringAsync();
-                weatherData = JsonConvert.DeserializeObject<Root>(responseBody);
-            }
+                HttpClient client = new HttpClient();
+                Root weatherData = new Root();
+                client.BaseAddress = new Uri("https://www.metaweather.com/api/");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
 
-            return weatherData;
+                HttpResponseMessage response = await client.GetAsync("https://www.metaweather.com/api/location/44544/");
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    weatherData = JsonConvert.DeserializeObject<Root>(responseBody);
+                }
+                return weatherData;
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+                return null;
+                
+            }
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
